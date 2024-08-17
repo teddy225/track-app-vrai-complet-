@@ -232,26 +232,27 @@ class _LoginState extends State<Login> {
                     style: TextButton.styleFrom(
                         foregroundColor:
                             const Color.fromARGB(255, 200, 147, 0)),
-                    child:
-                        Text(creation ? 'j ai un compte' : 'Creer un compte'),
+                    child: Text(
+                        creation ? 'Creer un compte' : 'J\'ai deja un compte'),
                   )
                 ],
               ),
               Center(
-                  child: ElevatedButton(
-                onPressed: submit,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.only(
-                      left: 45, right: 45, bottom: 10, top: 10),
-                  elevation: 4,
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 240, 177, 2),
+                child: ElevatedButton(
+                  onPressed: submit,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.only(
+                        left: 45, right: 45, bottom: 10, top: 10),
+                    elevation: 4,
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(255, 240, 177, 2),
+                  ),
+                  child: Text(
+                    creation ? 'Se Connecter' : 'creer un compte',
+                    style: const TextStyle(fontSize: 14),
+                  ),
                 ),
-                child: Text(
-                  creation ? 'crer un compte ' : 'Se Connecter',
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ))
+              ),
             ],
           ),
         ),
