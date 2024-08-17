@@ -1,6 +1,8 @@
 import 'package:depense_track/screen/add_depense_screen.dart';
-import 'package:depense_track/screen/model/categorie.dart';
-import 'package:depense_track/screen/model/depense.dart';
+import 'package:depense_track/model/categorie.dart';
+import 'package:depense_track/model/depense.dart';
+import 'package:depense_track/model/revenu.dart';
+import 'package:depense_track/model/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,24 +20,26 @@ class _HomeScreenState extends State<HomeScreen> {
         context: context,
         builder: (ctx) {
           return AddDepenseScreen(
-            addnewdepenseourevenu: addnewDepense_ou_revenu,
+            addnewdepense: addNewdepense,
+            addNewRevenu: addnewRevenu,
           );
         });
   }
 
-  void addnewDepense_ou_revenu(
-      {required String titre,
-      required double montant,
-      required DateTime date,
-      required Categorie categorie}) {
+  void addNewdepense(DepenseModel depense) {
     setState(() {
-      listdepense.add(
-        DepenseModel(
-            titre: titre, montant: montant, date: date, categorie: categorie),
-      );
+      transaction.add(depense);
     });
   }
 
+  void addnewRevenu(Revenu revenu) {
+    setState(() {
+      transaction.add(revenu);
+    });
+  }
+
+  List<Revenu> listrevenu = [];
+  List<Transaction> transaction = [];
   List<DepenseModel> listdepense = [
     DepenseModel(
       titre: 'lol1',
@@ -72,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: const Color.fromARGB(255, 220, 166, 39),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  height: 150,
+                  height: 115,
                   width: double.infinity,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,42 +121,148 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(
                 height: 10,
               ),
+              // SizedBox(
+              //   height: 200,
+              //   child: ListView.builder(
+              //       shrinkWrap: true,
+              //       itemCount: listdepense.length,
+              //       itemBuilder: (ctx, index) {
+              //         return ListTile(
+              //           dense: true,
+              //           leading: CircleAvatar(
+              //             backgroundColor:
+              //                 listdepense[index].categorie.couleurBack,
+              //             child: listdepense[index].categorie.icon,
+              //           ),
+              //           title: Text(
+              //             listdepense[index].titre,
+              //             style: const TextStyle(
+              //                 fontWeight: FontWeight.bold, fontSize: 14),
+              //           ),
+              //           trailing: Text(
+              //             '${listdepense[index].montant} Fcafa',
+              //             style: const TextStyle(
+              //               fontSize: 12,
+              //               fontWeight: FontWeight.bold,
+              //             ),
+              //           ),
+              //           subtitle: Text(
+              //             ' ${listdepense[index].categorie.nom} - ${DateFormat('MMMM d, y').format(listdepense[index].date)}',
+              //             style: const TextStyle(fontSize: 13),
+              //           ),
+              //           shape: const Border(
+              //             bottom: BorderSide(
+              //               width: 0.5,
+              //               color: Colors.grey,
+              //             ),
+              //           ),
+              //         );
+              //       }),
+              // ),
+              // SizedBox(
+              //   height: 200,
+              //   child: ListView.builder(
+              //       itemCount: listrevenu.length,
+              //       itemBuilder: (ctx, index) {
+              //         return ListTile(
+              //           dense: true,
+              //           leading: CircleAvatar(
+              //             backgroundColor: Colors.amber,
+              //             child: listrevenu[index].iconRevenu,
+              //           ),
+              //           title: Text(
+              //             listrevenu[index].description,
+              //             style: const TextStyle(
+              //                 fontWeight: FontWeight.bold, fontSize: 14),
+              //           ),
+              //           trailing: Text(
+              //             '${listrevenu[index].montant} Fcafa',
+              //             style: const TextStyle(
+              //               fontSize: 12,
+              //               fontWeight: FontWeight.bold,
+              //             ),
+              //           ),
+              //           subtitle: Text(
+              //             'Revenu - ${DateFormat('MMMM d, y').format(listrevenu[index].date)}',
+              //             style: const TextStyle(fontSize: 13),
+              //           ),
+              //           shape: const Border(
+              //             bottom: BorderSide(
+              //               width: 0.5,
+              //               color: Colors.grey,
+              //             ),
+              //           ),
+              //         );
+              //       }),
+              // ),
               SizedBox(
-                height: 310,
+                height: 350,
                 child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: listdepense.length,
+                    itemCount: transaction.length,
                     itemBuilder: (ctx, index) {
-                      return ListTile(
-                        dense: true,
-                        leading: CircleAvatar(
-                          backgroundColor:
-                              listdepense[index].categorie.couleurBack,
-                          child: listdepense[index].categorie.icon,
-                        ),
-                        title: Text(
-                          listdepense[index].titre,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        trailing: Text(
-                          '${listdepense[index].montant} Fcafa',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                      var transactionSelect = transaction[index];
+                      if (transactionSelect is DepenseModel) {
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor:
+                                transactionSelect.categorie.couleurBack,
+                            child: transactionSelect.categorie.icon,
                           ),
-                        ),
-                        subtitle: Text(
-                          ' ${listdepense[index].categorie.nom} - ${DateFormat('MMMM d, y').format(listdepense[index].date)}',
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                        shape: const Border(
-                          bottom: BorderSide(
-                            width: 0.5,
-                            color: Colors.grey,
+                          title: Text(
+                            transactionSelect.titre,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14),
                           ),
-                        ),
-                      );
+                          trailing: Text(
+                            '${transactionSelect.montant} Fcafa',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Depense - ${DateFormat('MMMM d, y').format(transactionSelect.date)}',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          shape: const Border(
+                            bottom: BorderSide(
+                              width: 0.5,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        );
+                      } else if (transactionSelect is Revenu) {
+                        return ListTile(
+                          dense: true,
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.amber,
+                            child: transactionSelect.iconRevenu,
+                          ),
+                          title: Text(
+                            transactionSelect.description,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          trailing: Text(
+                            '${transactionSelect.montant} Fcafa',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Revenu - ${DateFormat('MMMM d, y').format(transactionSelect.date)}',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          shape: const Border(
+                            bottom: BorderSide(
+                              width: 0.5,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        );
+                      }
+                      return Container();
                     }),
               )
             ],

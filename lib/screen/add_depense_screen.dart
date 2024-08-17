@@ -1,17 +1,16 @@
-import 'package:depense_track/screen/model/categorie.dart';
+import 'package:depense_track/model/categorie.dart';
+import 'package:depense_track/model/depense.dart';
+import 'package:depense_track/model/revenu.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 List<String> list = <String>['Une dépense', ' Un revenu'];
 
 class AddDepenseScreen extends StatefulWidget {
-  const AddDepenseScreen({required this.addnewdepenseourevenu, super.key});
-  final Function({
-    required String titre,
-    required double montant,
-    required DateTime date,
-    required Categorie categorie,
-  }) addnewdepenseourevenu;
+  const AddDepenseScreen(
+      {required this.addnewdepense, required this.addNewRevenu, super.key});
+  final Function(DepenseModel) addnewdepense;
+  final Function(Revenu) addNewRevenu;
 
   @override
   State<AddDepenseScreen> createState() => _AddDepenseScreenState();
@@ -43,18 +42,22 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
       _formKey.currentState!.save();
       if (validerForm) {
         if (dropdownValue == list[0]) {
-          widget.addnewdepenseourevenu(
-            titre: titreDepense,
-            montant: montantDepense,
-            date: datechoisir!,
-            categorie: Categorie(
-              nom: _selectedCategory!.nom,
-              icon: _selectedCategory!.icon,
-              couleurBack: _selectedCategory!.couleurBack,
-            ),
-          );
-        } else {
-          print('object');
+          //ici j'ai fai un contructeur tres compliquer
+          widget.addnewdepense(DepenseModel(
+              titre: titreDepense,
+              montant: montantDepense,
+              date: datechoisir!,
+              categorie: Categorie(
+                  nom: _selectedCategory!.nom,
+                  icon: _selectedCategory!.icon,
+                  couleurBack: backIconCouleurSelect!)));
+        } else if (dropdownValue == list[1]) {
+          //Ici c'est la meilleur solution
+          widget.addNewRevenu(Revenu(
+              montant: montantDepense,
+              description: titreDepense,
+              date: datechoisir!,
+              iconRevenu: const Icon(Icons.monetization_on_outlined)));
         }
       }
     }
