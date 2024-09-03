@@ -38,7 +38,64 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
 
   void submit() {
     final validerForm = _formKey.currentState!.validate();
+
     if (validerForm) {
+      //verification de la selection de la categorie de depense
+      if (_selectedCategory == null && list[0] != 'Une dépense') {
+        showDialog(
+            context: context,
+            builder: (ctx) {
+              return AlertDialog(
+                title: const Text(
+                  "Erreur",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+                content: const Text(
+                  'Veulliez selectionnez une categorie de depense !',
+                  style: TextStyle(fontSize: 16),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'))
+                ],
+              );
+            });
+        return;
+      }
+      if (datechoisir == null) {
+        showDialog(
+            context: context,
+            builder: (ctx) {
+              return AlertDialog(
+                title: const Text(
+                  "Date non precisé",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+                content: const Text(
+                  'Ajouter la date',
+                  style: TextStyle(fontSize: 16),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'))
+                ],
+              );
+            });
+        return;
+      }
+
       _formKey.currentState!.save();
       if (validerForm) {
         if (dropdownValue == list[0]) {
@@ -53,15 +110,18 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
                   couleurBack: backIconCouleurSelect!)));
         } else if (dropdownValue == list[1]) {
           //Ici c'est la meilleur solution
-          widget.addNewRevenu(Revenu(
+          widget.addNewRevenu(
+            Revenu(
               montant: montantDepense,
               description: titreDepense,
               date: datechoisir!,
-              iconRevenu: const Icon(Icons.monetization_on_outlined)));
+              iconRevenu: const Icon(Icons.monetization_on_outlined),
+            ),
+          );
         }
       }
+      Navigator.of(context).pop();
     }
-    Navigator.of(context).pop();
   }
 
   final List<Categorie> _categories = [
@@ -89,12 +149,20 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
       couleurBack: const Color.fromARGB(255, 247, 217, 174),
     ),
     Categorie(
-      nom: 'imprevu',
+      nom: 'Imprevu',
       icon: const Icon(
         Icons.keyboard_command_key_sharp,
         color: Color.fromARGB(255, 255, 8, 8),
       ),
-      couleurBack: Color.fromARGB(255, 248, 161, 161),
+      couleurBack: const Color.fromARGB(255, 248, 161, 161),
+    ),
+    Categorie(
+      nom: 'Facture',
+      icon: const Icon(
+        Icons.electric_bolt_rounded,
+        color: Color.fromARGB(255, 2, 132, 0),
+      ),
+      couleurBack: const Color.fromARGB(255, 103, 255, 118),
     ),
   ];
 
@@ -250,7 +318,7 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
                     ),
                     validator: (valeur) {
                       if (valeur == null || valeur.trim().isEmpty) {
-                        return 'SVP entrer une address valide';
+                        return 'SVP entrer une somme valide';
                       }
                       return null;
                     },
@@ -290,7 +358,7 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
                     ),
                     validator: (valeur) {
                       if (valeur == null || valeur.trim().isEmpty) {
-                        return 'SVP entrer une address valide';
+                        return 'SVP entrer une description valide';
                       }
                       return null;
                     },
@@ -319,7 +387,8 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
                                       color: Color.fromARGB(255, 244, 144, 14)),
                                 ),
                                 Text(
-                                  DateFormat('MMMM d, y').format(datechoisir!),
+                                  DateFormat.yMMMd('fr_FR')
+                                      .format(datechoisir!),
                                   style: datechoisir != null
                                       ? const TextStyle(
                                           color: Colors.blue,

@@ -1,8 +1,8 @@
 import 'package:depense_track/screen/add_depense_screen.dart';
-import 'package:depense_track/model/categorie.dart';
 import 'package:depense_track/model/depense.dart';
 import 'package:depense_track/model/revenu.dart';
 import 'package:depense_track/model/transaction.dart';
+import 'package:depense_track/widgets/containerDepense.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,8 +14,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<Transaction> transactions = [];
   void _modalbottomShette() {
     showModalBottomSheet(
+        useRootNavigator: true,
         isScrollControlled: true,
         context: context,
         builder: (ctx) {
@@ -28,32 +30,52 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void addNewdepense(DepenseModel depense) {
     setState(() {
-      transaction.add(depense);
+      transactions.insert(0, depense);
+      calculeSomme();
     });
   }
 
   void addnewRevenu(Revenu revenu) {
     setState(() {
-      transaction.add(revenu);
+      transactions.insert(
+        0,
+        revenu,
+      );
+      calculeSomme();
     });
   }
 
-  List<Revenu> listrevenu = [];
-  List<Transaction> transaction = [];
-  List<DepenseModel> listdepense = [
-    DepenseModel(
-      titre: 'lol1',
-      montant: 100,
-      date: DateTime.now(),
-      categorie: Categorie(
-          nom: 'Shopping',
-          icon: const Icon(
-            Icons.shopping_bag,
-            color: Colors.purple,
-          ),
-          couleurBack: const Color.fromARGB(255, 245, 206, 252)),
-    ),
-  ];
+  void supprimer(Transaction transaction) {
+    setState(() {
+      transactions
+          .removeWhere((transactions) => transactions.id == transaction.id);
+    });
+  }
+
+  double totalRevenu = 0;
+  double totalDepense = 0;
+  double sommebalace = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    calculeSomme();
+  }
+
+  void calculeSomme() {
+    totalRevenu = transactions
+        .where((transaction) => transaction is Revenu)
+        .fold<double>(totalRevenu,
+            (previousValue, element) => previousValue + element.montant);
+    ;
+
+    totalDepense = transactions
+        .where((transaction) => transaction is DepenseModel)
+        .fold(
+            totalDepense, (somme, transaction) => somme + transaction.montant);
+    sommebalace = totalRevenu - totalDepense;
+    if (totalRevenu <= totalDepense) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,26 +92,40 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
+              const SizedBox(
+                height: 5,
+              ),
               Center(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 220, 166, 39),
+                    color: const Color.fromARGB(255, 220, 151, 39),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  height: 115,
+                  height: 100,
                   width: double.infinity,
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(left: 15),
                         child: Text(
                           'Total de la balance',
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: Text(
+                          '${sommebalace.toString()} fcfa',
+                          style: const TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              wordSpacing: 2),
                         ),
                       ),
                     ],
@@ -102,19 +138,15 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 255, 206, 58),
-                        borderRadius: BorderRadius.circular(10)),
-                    height: 170,
-                    width: 180,
+                  Containerdepense(
+                    titreContainer: ' Total des revenus',
+                    somme: totalRevenu,
+                    couleurContainer: const Color.fromARGB(255, 27, 132, 158),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 201, 152, 3),
-                        borderRadius: BorderRadius.circular(10)),
-                    height: 170,
-                    width: 180,
+                  Containerdepense(
+                    titreContainer: ' Total des depenses',
+                    somme: totalDepense,
+                    couleurContainer: const Color.fromARGB(255, 248, 75, 62),
                   ),
                 ],
               ),
@@ -196,68 +228,143 @@ class _HomeScreenState extends State<HomeScreen> {
               //       }),
               // ),
               SizedBox(
-                height: 350,
+                height: 380,
                 child: ListView.builder(
-                    itemCount: transaction.length,
+                    physics: const ScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: transactions.length,
                     itemBuilder: (ctx, index) {
-                      var transactionSelect = transaction[index];
+                      var transactionSelect = transactions[index];
                       if (transactionSelect is DepenseModel) {
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor:
-                                transactionSelect.categorie.couleurBack,
-                            child: transactionSelect.categorie.icon,
-                          ),
-                          title: Text(
-                            transactionSelect.titre,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                          trailing: Text(
-                            '${transactionSelect.montant} Fcafa',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                        return Dismissible(
+                          background: Container(
+                            margin: const EdgeInsets.only(bottom: 2),
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(54, 152, 244, 1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.edit_sharp,
+                              color: Colors.white,
                             ),
                           ),
-                          subtitle: Text(
-                            'Depense - ${DateFormat('MMMM d, y').format(transactionSelect.date)}',
-                            style: const TextStyle(fontSize: 13),
+                          secondaryBackground: Container(
+                            margin: const EdgeInsets.only(bottom: 2),
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
                           ),
-                          shape: const Border(
-                            bottom: BorderSide(
-                              width: 0.5,
-                              color: Colors.grey,
+                          key: Key(transactionSelect.id),
+                          direction: DismissDirection.horizontal,
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.endToStart) {
+                              supprimer(transactionSelect);
+                            } else {
+                              _modalbottomShette();
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: const Color.fromARGB(149, 255, 1, 1),
+                            ),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    transactionSelect.categorie.couleurBack,
+                                child: transactionSelect.categorie.icon,
+                              ),
+                              title: Text(
+                                transactionSelect.titre,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: Colors.white),
+                              ),
+                              trailing: Text(
+                                '${transactionSelect.montant} Fcafa',
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              subtitle: Text(
+                                'Depense - ${DateFormat.yMMMd('fr_FR').format(transactionSelect.date)}',
+                                style: const TextStyle(
+                                    fontSize: 13, color: Colors.white),
+                              ),
                             ),
                           ),
                         );
                       } else if (transactionSelect is Revenu) {
-                        return ListTile(
-                          dense: true,
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.amber,
-                            child: transactionSelect.iconRevenu,
-                          ),
-                          title: Text(
-                            transactionSelect.description,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                          trailing: Text(
-                            '${transactionSelect.montant} Fcafa',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                        return Dismissible(
+                          background: Container(
+                            margin: const EdgeInsets.only(bottom: 2),
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(54, 152, 244, 1),
+                              borderRadius: BorderRadius.circular(10),
                             ),
+                            child: const Icon(Icons.delete),
                           ),
-                          subtitle: Text(
-                            'Revenu - ${DateFormat('MMMM d, y').format(transactionSelect.date)}',
-                            style: const TextStyle(fontSize: 13),
+                          secondaryBackground: Container(
+                            margin: const EdgeInsets.only(bottom: 2),
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.delete),
                           ),
-                          shape: const Border(
-                            bottom: BorderSide(
-                              width: 0.5,
-                              color: Colors.grey,
+                          key: Key(transactionSelect.id),
+                          direction: DismissDirection.horizontal,
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.endToStart) {
+                              supprimer(transactionSelect);
+                            } else {
+                              _modalbottomShette();
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: const Color.fromARGB(147, 30, 233, 255),
+                            ),
+                            child: ListTile(
+                              dense: true,
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.amber,
+                                child: transactionSelect.iconRevenu,
+                              ),
+                              title: Text(
+                                transactionSelect.description,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              trailing: Text(
+                                '${transactionSelect.montant} Fcafa',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Revenu - ${DateFormat('MMMM d, y').format(transactionSelect.date)}',
+                                style: const TextStyle(fontSize: 13),
+                              ),
                             ),
                           ),
                         );

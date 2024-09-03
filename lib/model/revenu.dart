@@ -17,4 +17,25 @@ class Revenu extends Transaction {
   final String description;
   final DateTime date;
   final Icon iconRevenu;
+
+  @override
+  // il faut toujour maper la liste donc c'est du json
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'montant': montant,
+      'description': description,
+      'date': date,
+      'icon': iconRevenu,
+      'type': 'revenue',
+    };
+  }
+
+  factory Revenu.fromMap(Map<String, dynamic> map) {
+    return Revenu(
+        montant: map['montant'],
+        description: map['description'],
+        date: map['date'],
+        iconRevenu: map['iconRevenu']);
+  }
 }
