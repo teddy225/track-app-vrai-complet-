@@ -16,7 +16,7 @@ abstract class Transaction {
 
   Map<String, dynamic> toMap();
   factory Transaction.fromMap(Map<String, dynamic> map) {
-    if (map['type'] == ' revenue') {
+    if (map['type'] == 'revenue') {
       return Revenu.fromMap(map);
     } else {
       return DepenseModel.fromMap(map);

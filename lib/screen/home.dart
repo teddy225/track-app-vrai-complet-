@@ -1,3 +1,4 @@
+import 'package:depense_track/model/categorie.dart';
 import 'package:depense_track/screen/add_depense_screen.dart';
 import 'package:depense_track/model/depense.dart';
 import 'package:depense_track/model/revenu.dart';
@@ -5,6 +6,7 @@ import 'package:depense_track/model/transaction.dart';
 import 'package:depense_track/widgets/containerDepense.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqlite_api.dart' as sqflite;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +16,49 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+//mauvaise pratique j'aurai besoin d'un riverpod
+  final List<Categorie> categories = [
+    Categorie(
+        nom: 'Shopping',
+        icon: const Icon(
+          Icons.shopping_bag,
+          color: Colors.purple,
+        ),
+        couleurBack: const Color.fromARGB(255, 245, 206, 252)),
+    Categorie(
+      nom: 'Transport',
+      icon: const Icon(
+        Icons.car_repair_rounded,
+        color: Colors.green,
+      ),
+      couleurBack: const Color.fromARGB(255, 205, 251, 207),
+    ),
+    Categorie(
+      nom: 'Nourriture',
+      icon: const Icon(
+        Icons.food_bank,
+        color: Colors.orange,
+      ),
+      couleurBack: const Color.fromARGB(255, 247, 217, 174),
+    ),
+    Categorie(
+      nom: 'Imprevu',
+      icon: const Icon(
+        Icons.keyboard_command_key_sharp,
+        color: Color.fromARGB(255, 255, 8, 8),
+      ),
+      couleurBack: const Color.fromARGB(255, 248, 161, 161),
+    ),
+    Categorie(
+      nom: 'Facture',
+      icon: const Icon(
+        Icons.electric_bolt_rounded,
+        color: Color.fromARGB(255, 2, 132, 0),
+      ),
+      couleurBack: const Color.fromARGB(255, 103, 255, 118),
+    ),
+  ];
+
   List<Transaction> transactions = [];
   void _modalbottomShette() {
     showModalBottomSheet(
@@ -63,18 +108,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void calculeSomme() {
-    totalRevenu = transactions
-        .where((transaction) => transaction is Revenu)
-        .fold<double>(totalRevenu,
-            (previousValue, element) => previousValue + element.montant);
+    totalRevenu = transactions.whereType<Revenu>().fold<double>(totalRevenu,
+        (previousValue, element) => previousValue + element.montant);
     ;
 
-    totalDepense = transactions
-        .where((transaction) => transaction is DepenseModel)
-        .fold(
-            totalDepense, (somme, transaction) => somme + transaction.montant);
+    totalDepense = transactions.whereType<DepenseModel>().fold(
+        totalDepense, (somme, transaction) => somme + transaction.montant);
     sommebalace = totalRevenu - totalDepense;
     if (totalRevenu <= totalDepense) {}
+  }
+
+  // creation de la ba de donner de sans riverpod jesper que sa va passer
+  Future<void> _creationDb(sqflite.Database db, int version) async {
+    // je veux cree une la table de de transaction
   }
 
   @override
@@ -236,6 +282,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (ctx, index) {
                       var transactionSelect = transactions[index];
                       if (transactionSelect is DepenseModel) {
+                        Categorie? categorie = getCategorieById(
+                            transactionSelect.categorieId, categories);
+
                         return Dismissible(
                           background: Container(
                             margin: const EdgeInsets.only(bottom: 2),
@@ -280,9 +329,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: ListTile(
                               leading: CircleAvatar(
-                                backgroundColor:
-                                    transactionSelect.categorie.couleurBack,
-                                child: transactionSelect.categorie.icon,
+                                backgroundColor: categorie?.couleurBack,
+                                child: categorie?.icon,
                               ),
                               title: Text(
                                 transactionSelect.titre,

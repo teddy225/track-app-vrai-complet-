@@ -17,9 +17,10 @@ class Categorie {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'nom': nom,
       'icon': icon,
-      'couleurBack': couleurBack,
+      'couleurBack': couleurBack.toString(),
     };
   }
 
@@ -31,4 +32,10 @@ class Categorie {
       couleurBack: map['couleurBack'],
     );
   }
+}
+
+Categorie? getCategorieById(String id, List<Categorie> categories) {
+  return categories.firstWhere(
+    (categorie) => categorie.id == id,
+  );
 }

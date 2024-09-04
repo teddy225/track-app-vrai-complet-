@@ -9,22 +9,23 @@ class DepenseModel extends Transaction {
     required this.titre,
     required super.montant,
     required super.date,
-    required this.categorie,
+    required this.categorieId,
   }) : id = uuid.v4();
   final String id;
   final String titre;
-  final Categorie categorie;
+  final String categorieId;
 
   @override
   //ici il faut maper la liste qui est du json  en vrai
+
   Map<String, dynamic> toMap() {
     return {
       // DU JSON
       'id': id,
       'montant': montant,
       'description': titre,
-      'date': date,
-      'categorie': categorie.id,
+      'date': date.toIso8601String(),
+      'categorie': categorieId,
       'type': 'depense',
     };
   }
@@ -34,7 +35,7 @@ class DepenseModel extends Transaction {
         //voici la map
         montant: map['montant'],
         titre: map['description'],
-        date: map['date'],
-        categorie: map['']);
+        date: DateTime.parse(map['date']),
+        categorieId: map['categorieId']);
   }
 }

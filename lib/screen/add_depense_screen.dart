@@ -104,10 +104,7 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
               titre: titreDepense,
               montant: montantDepense,
               date: datechoisir!,
-              categorie: Categorie(
-                  nom: _selectedCategory!.nom,
-                  icon: _selectedCategory!.icon,
-                  couleurBack: backIconCouleurSelect!)));
+              categorieId: _selectedCategory!.id));
         } else if (dropdownValue == list[1]) {
           //Ici c'est la meilleur solution
           widget.addNewRevenu(
