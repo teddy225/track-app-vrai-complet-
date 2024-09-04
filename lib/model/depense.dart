@@ -1,4 +1,3 @@
-import 'package:depense_track/model/categorie.dart';
 import 'package:depense_track/model/transaction.dart';
 import 'package:uuid/uuid.dart';
 
@@ -10,10 +9,12 @@ class DepenseModel extends Transaction {
     required super.montant,
     required super.date,
     required this.categorieId,
+    required this.type,
   }) : id = uuid.v4();
   final String id;
   final String titre;
   final String categorieId;
+  final String type;
 
   @override
   //ici il faut maper la liste qui est du json  en vrai
@@ -36,6 +37,7 @@ class DepenseModel extends Transaction {
         montant: map['montant'],
         titre: map['description'],
         date: DateTime.parse(map['date']),
-        categorieId: map['categorieId']);
+        categorieId: map['categorieId'],
+        type: map['type']);
   }
 }

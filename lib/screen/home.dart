@@ -1,3 +1,4 @@
+import 'package:depense_track/database/db_local.dart';
 import 'package:depense_track/model/categorie.dart';
 import 'package:depense_track/screen/add_depense_screen.dart';
 import 'package:depense_track/model/depense.dart';
@@ -58,6 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
       couleurBack: const Color.fromARGB(255, 103, 255, 118),
     ),
   ];
+  void chargerTransactions() async {
+    List<Transaction> allTransactions =
+        await DatabaseHelper.instance.getAllTransactions();
+    setState(() {
+      transactions = allTransactions; // Remplace ta liste locale
+    });
+  }
 
   List<Transaction> transactions = [];
   void _modalbottomShette() {
@@ -73,14 +81,16 @@ class _HomeScreenState extends State<HomeScreen> {
         });
   }
 
-  void addNewdepense(DepenseModel depense) {
+  void addNewdepense(DepenseModel depense) async {
+    await DatabaseHelper.instance.insertTransaction(depense);
     setState(() {
       transactions.insert(0, depense);
       calculeSomme();
     });
   }
 
-  void addnewRevenu(Revenu revenu) {
+  void addnewRevenu(Revenu revenu) async {
+    await DatabaseHelper.instance.insertTransaction(revenu);
     setState(() {
       transactions.insert(
         0,
@@ -90,7 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void supprimer(Transaction transaction) {
+  void supprimer(Transaction transaction) async {
+    await DatabaseHelper.instance.deleteTransaction(transaction.id);
+
     setState(() {
       transactions
           .removeWhere((transactions) => transactions.id == transaction.id);
@@ -105,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     calculeSomme();
+    chargerTransactions();
   }
 
   void calculeSomme() {

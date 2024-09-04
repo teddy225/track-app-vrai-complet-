@@ -59,10 +59,11 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
                 ),
                 actions: [
                   TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('OK'))
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('OK'),
+                  )
                 ],
               );
             });
@@ -104,7 +105,8 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
               titre: titreDepense,
               montant: montantDepense,
               date: datechoisir!,
-              categorieId: _selectedCategory!.id));
+              categorieId: _selectedCategory!.id,
+              type: 'depense'));
         } else if (dropdownValue == list[1]) {
           //Ici c'est la meilleur solution
           widget.addNewRevenu(
@@ -113,6 +115,7 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
               description: titreDepense,
               date: datechoisir!,
               iconRevenu: const Icon(Icons.monetization_on_outlined),
+              type: 'revenu',
             ),
           );
         }

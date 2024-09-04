@@ -10,6 +10,7 @@ class Revenu extends Transaction {
     required this.description,
     required this.date,
     required this.iconRevenu,
+    required this.type,
   })  : id = uuid.v4(),
         super(montant: montant, date: date);
   final String id;
@@ -17,6 +18,7 @@ class Revenu extends Transaction {
   final String description;
   final DateTime date;
   final Icon iconRevenu;
+  final String type;
 
   @override
   // il faut toujour maper la liste donc c'est du json
@@ -36,6 +38,7 @@ class Revenu extends Transaction {
         montant: map['montant'],
         description: map['description'],
         date: map['date'],
-        iconRevenu: map['iconRevenu']);
+        iconRevenu: map['iconRevenu'],
+        type: map['type']);
   }
 }
