@@ -1,10 +1,14 @@
-import 'package:depense_track/screen/home.dart';
-import 'package:depense_track/screen/login.dart';
+import 'package:depense_track/presentation/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -29,11 +33,7 @@ class MyApp extends StatelessWidget {
             seedColor: const Color.fromARGB(255, 224, 176, 56)),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const Login(),
-        'Home': (context) => const HomeScreen(),
-      },
+      home: Home(),
     );
   }
 }

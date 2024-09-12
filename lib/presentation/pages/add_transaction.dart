@@ -1,22 +1,21 @@
-import 'package:depense_track/model/categorie.dart';
-import 'package:depense_track/model/depense.dart';
-import 'package:depense_track/model/revenu.dart';
+import 'package:depense_track/data/model/transaction_model.dart';
+import 'package:depense_track/presentation/providers/transaction_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:depense_track/data/data%20const/data_const.dart';
+import 'package:depense_track/data/model/categorie_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-List<String> list = <String>['Une dépense', ' Un revenu'];
+List<String> list = <String>['Une dépense', 'Un revenu'];
 
-class AddDepenseScreen extends StatefulWidget {
-  const AddDepenseScreen(
-      {required this.addnewdepense, required this.addNewRevenu, super.key});
-  final Function(DepenseModel) addnewdepense;
-  final Function(Revenu) addNewRevenu;
+class FormAddTransaction extends ConsumerStatefulWidget {
+  const FormAddTransaction({super.key});
 
   @override
-  State<AddDepenseScreen> createState() => _AddDepenseScreenState();
+  ConsumerState<FormAddTransaction> createState() => _FormAddTransactionState();
 }
 
-class _AddDepenseScreenState extends State<AddDepenseScreen> {
+class _FormAddTransactionState extends ConsumerState<FormAddTransaction> {
   final _formKey = GlobalKey<FormState>();
   String titreDepense = '';
   double montantDepense = 0;
@@ -67,6 +66,7 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
                 ],
               );
             });
+
         return;
       }
       if (datechoisir == null) {
@@ -99,72 +99,24 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
 
       _formKey.currentState!.save();
       if (validerForm) {
-        if (dropdownValue == list[0]) {
-          //ici j'ai fai un contructeur tres compliquer
-          widget.addnewdepense(DepenseModel(
-              titre: titreDepense,
-              montant: montantDepense,
-              date: datechoisir!,
-              categorieId: _selectedCategory!.id,
-              type: 'depense'));
-        } else if (dropdownValue == list[1]) {
-          //Ici c'est la meilleur solution
-          widget.addNewRevenu(
-            Revenu(
-              montant: montantDepense,
-              description: titreDepense,
-              date: datechoisir!,
-              iconRevenu: const Icon(Icons.monetization_on_outlined),
-              type: 'revenu',
-            ),
-          );
-        }
+        final transactionAdd = ref.read(transactionRepositoriProvider);
+        transactionAdd.addTransaction(
+          TransactionModel(
+            montant: montantDepense,
+            typeTransaction:
+                dropdownValue == 'Un revenu' ? 'Revenu' : 'Dépense',
+            categorieId: dropdownValue == 'Un revenu'
+                ? 0
+                : _selectedCategory!.categorieId,
+            description: titreDepense,
+            date: datechoisir!,
+          ),
+        );
       }
+      setState(() {});
       Navigator.of(context).pop();
     }
   }
-
-  final List<Categorie> _categories = [
-    Categorie(
-        nom: 'Shopping',
-        icon: const Icon(
-          Icons.shopping_bag,
-          color: Colors.purple,
-        ),
-        couleurBack: const Color.fromARGB(255, 245, 206, 252)),
-    Categorie(
-      nom: 'Transport',
-      icon: const Icon(
-        Icons.car_repair_rounded,
-        color: Colors.green,
-      ),
-      couleurBack: const Color.fromARGB(255, 205, 251, 207),
-    ),
-    Categorie(
-      nom: 'Nourriture',
-      icon: const Icon(
-        Icons.food_bank,
-        color: Colors.orange,
-      ),
-      couleurBack: const Color.fromARGB(255, 247, 217, 174),
-    ),
-    Categorie(
-      nom: 'Imprevu',
-      icon: const Icon(
-        Icons.keyboard_command_key_sharp,
-        color: Color.fromARGB(255, 255, 8, 8),
-      ),
-      couleurBack: const Color.fromARGB(255, 248, 161, 161),
-    ),
-    Categorie(
-      nom: 'Facture',
-      icon: const Icon(
-        Icons.electric_bolt_rounded,
-        color: Color.fromARGB(255, 2, 132, 0),
-      ),
-      couleurBack: const Color.fromARGB(255, 103, 255, 118),
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -270,13 +222,18 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
                         isExpanded: true,
                         style:
                             const TextStyle(color: Colors.black, fontSize: 18),
-                        items: _categories.map<DropdownMenuItem<Categorie>>(
-                            (Categorie value) {
+                        items: categories
+                            .skip(1)
+                            .map<DropdownMenuItem<Categorie>>(
+                                (Categorie value) {
                           return DropdownMenuItem<Categorie>(
                             value: value,
                             child: Row(
                               children: [
-                                value.icon,
+                                Icon(
+                                  value.icon,
+                                  color: value.couleurIcon,
+                                ),
                                 // You can customize this icon
                                 const SizedBox(width: 8),
                                 Text(value.nom),
@@ -419,5 +376,14 @@ class _AddDepenseScreenState extends State<AddDepenseScreen> {
         ],
       ),
     );
+  }
+}
+
+class AddTransaction extends ConsumerWidget {
+  const AddTransaction({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return const Placeholder();
   }
 }

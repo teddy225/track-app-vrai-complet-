@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Containerdepense extends StatelessWidget {
-  const Containerdepense(
+class ContainerTransaction extends StatelessWidget {
+  const ContainerTransaction(
       {super.key,
       required this.titreContainer,
       required this.somme,
