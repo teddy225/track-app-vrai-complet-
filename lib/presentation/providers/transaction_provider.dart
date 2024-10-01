@@ -1,4 +1,5 @@
 import 'package:depense_track/data/dataresources/local_db.dart';
+import 'package:depense_track/data/model/statistique.dart';
 import 'package:depense_track/domain/entities/transation_entite.dart';
 import 'package:depense_track/domain/repositories/transactionRepositorieImpl.dart';
 import 'package:depense_track/domain/repositories/transaction_repositori.dart';
@@ -22,3 +23,8 @@ final transactionListProvder =
     return userCase.getTransations();
   },
 );
+
+final statisiqueProvdier = StreamProvider<Statistique>((ref) {
+  final repositori = ref.watch(transactionRepositoriProvider);
+  return repositori.watchStatique();
+});

@@ -31,7 +31,7 @@ class WidgetTransation extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: type == 'Revenu'
+        color: type == 'revenu'
             ? const Color.fromARGB(164, 40, 228, 249)
             : const Color.fromARGB(228, 247, 95, 75),
       ),
@@ -39,7 +39,7 @@ class WidgetTransation extends StatelessWidget {
         dense: true,
         leading: CircleAvatar(
           backgroundColor: couleurBack,
-          child: type == 'Revenu'
+          child: type == 'revenu'
               ? const Icon(
                   Icons.monetization_on,
                   color: Colors.amber,
@@ -54,7 +54,7 @@ class WidgetTransation extends StatelessWidget {
           style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,
-              color: type == 'Revenu'
+              color: type == 'revenu'
                   ? const Color.fromARGB(255, 11, 9, 9)
                   : const Color.fromARGB(255, 255, 255, 255)),
         ),
@@ -65,7 +65,7 @@ class WidgetTransation extends StatelessWidget {
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: type == 'Revenu'
+                  color: type == 'revenu'
                       ? const Color.fromARGB(255, 11, 9, 9)
                       : const Color.fromARGB(255, 255, 255, 255)),
             ),
@@ -74,16 +74,11 @@ class WidgetTransation extends StatelessWidget {
         subtitle: Text(
           '$type : ${DateFormat.yMMMd('fr_FR').format(date)}',
           style: TextStyle(
-              fontSize: 14,
-              color: type == 'revenue'
+              fontWeight: FontWeight.bold,
+              fontSize: type == 'revenu' ? 14 : 13.8,
+              color: type == 'revenu'
                   ? const Color.fromARGB(255, 11, 9, 9)
                   : const Color.fromARGB(255, 255, 255, 255)),
-        ),
-        shape: const Border(
-          bottom: BorderSide(
-            width: 0.5,
-            color: Colors.grey,
-          ),
         ),
       ),
     );

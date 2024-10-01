@@ -6,10 +6,12 @@ class TransactionModel extends TransactionEntite {
       required super.typeTransaction,
       required super.categorieId,
       required super.description,
-      required super.date});
+      required super.date,
+      required super.uuui});
 
   Map<String, dynamic> toMap() {
     return {
+      'uuui': uuui,
       'montant': montant,
       'typeTransaction': typeTransaction,
       'categorieId': categorieId,
@@ -20,6 +22,7 @@ class TransactionModel extends TransactionEntite {
 
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
+      uuui: map['uuui'],
       montant: map['montant'],
       typeTransaction: map['typeTransaction'],
       categorieId: map['categorieId'],

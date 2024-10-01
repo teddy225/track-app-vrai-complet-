@@ -1,6 +1,7 @@
 import 'package:depense_track/data/data%20const/data_const.dart';
 import 'package:depense_track/data/model/categorie_model.dart';
 import 'package:depense_track/data/model/transaction_model.dart';
+import 'package:depense_track/domain/entities/transation_entite.dart';
 import 'package:depense_track/presentation/pages/add_transaction.dart';
 import 'package:depense_track/presentation/pages/widgets/ContainerBalance.dart';
 import 'package:depense_track/presentation/pages/widgets/container_transaction.dart';
@@ -8,6 +9,9 @@ import 'package:depense_track/presentation/pages/widgets/widgets_transaction.dar
 import 'package:depense_track/presentation/providers/transaction_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+
+const uuid = Uuid();
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -21,20 +25,22 @@ class _HomeState extends ConsumerState<Home> {
   Widget build(BuildContext context) {
     final transactionListAsyncvalue = ref.watch(transactionListProvder);
     final transactionAction = ref.read(transactionRepositoriProvider);
+    final statistiqueasync = ref.watch(statisiqueProvdier);
 
-    Future<void> supprimerTansaction(String id) async {
-      return transactionAction.deletedTransaction(id);
+    Future<void> supprimerTansaction(TransactionEntite uuui) async {
+      return transactionAction.deletedTransaction(uuui);
     }
 
     Future<void> add() async {
       return setState(() {
         transactionAction.addTransaction(
           TransactionModel(
-            montant: 2,
+            montant: 2000,
             categorieId: 0,
             description: 'dksks',
             date: DateTime.now(),
-            typeTransaction: 'z',
+            typeTransaction: 'revenu',
+            uuui: uuid.v4(),
           ),
         );
       });
@@ -52,49 +58,86 @@ class _HomeState extends ConsumerState<Home> {
 
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-          onPressed: modalbottomShette,
+          onPressed: () {
+            modalbottomShette();
+          },
           child: const Icon(Icons.add),
         ),
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: const Text('Salut Teddy Bienvenue'),
+        ),
+        drawer: SafeArea(child: const Drawer()),
         body: SingleChildScrollView(
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  const ContainerBalance(sommebalace: 0.0),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
                     children: [
-                      ContainerTransaction(
-                        titreContainer: ' Total des revenus',
-                        somme: 0.0,
-                        couleurContainer:
-                            const Color.fromARGB(255, 27, 132, 158),
-                      ),
-                      ContainerTransaction(
-                        titreContainer: ' Total des depenses',
-                        somme: 0.0,
-                        couleurContainer:
-                            const Color.fromARGB(255, 248, 75, 62),
-                      ),
+                      statistiqueasync.when(
+                          data: ((stats) {
+                            return Column(
+                              children: [
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                ContainerBalance(sommebalace: stats.balance),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ContainerTransaction(
+                                      titreContainer: ' Total des revenus',
+                                      somme: stats.totalRevenu,
+                                      couleurContainer: const Color.fromARGB(
+                                          255, 27, 132, 158),
+                                    ),
+                                    ContainerTransaction(
+                                      titreContainer: ' Total des depenses',
+                                      somme: stats.totalDepense,
+                                      couleurContainer: const Color.fromARGB(
+                                          255, 248, 75, 62),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }),
+                          error: (e, _) => const Text('data'),
+                          loading: () => const CircularProgressIndicator())
                     ],
                   ),
                   const SizedBox(
                     height: 10,
                   ),
+                  const Row(
+                    children: [
+                      Text(
+                        'Historique',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
                   SizedBox(
-                    height: 600,
+                    height: 470,
                     child: transactionListAsyncvalue.when(data: (transaction) {
                       if (transaction.isEmpty) {
                         return const Center(
-                          child: Text('Pasd'),
+                          child: Text(
+                            'Pas De Depense & Revenu pour l\'instant',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         );
                       }
                       return ListView.builder(
@@ -102,6 +145,8 @@ class _HomeState extends ConsumerState<Home> {
                           shrinkWrap: true,
                           itemCount: transaction.length,
                           itemBuilder: (ctx, index) {
+                            print(transaction[index].date);
+                            print(transaction[index].uuui);
                             Categorie? categorie = getCategorieById(
                                 transaction[index].categorieId, categories);
                             return InkWell(
@@ -139,9 +184,7 @@ class _HomeState extends ConsumerState<Home> {
                                         TextButton(
                                           onPressed: () async {
                                             supprimerTansaction(
-                                                transaction[index]
-                                                    .date
-                                                    .toIso8601String());
+                                                transaction[index]);
                                             Navigator.of(context).pop();
                                           },
                                           child: const Text('Supprimer'),
@@ -171,7 +214,9 @@ class _HomeState extends ConsumerState<Home> {
                           });
                     }, loading: () {
                       return const Center(
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator(
+                          color: Colors.amber,
+                        ),
                       );
                     }, error: (error, stack) {
                       return Center(

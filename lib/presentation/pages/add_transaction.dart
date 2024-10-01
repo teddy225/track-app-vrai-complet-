@@ -5,7 +5,9 @@ import 'package:depense_track/data/data%20const/data_const.dart';
 import 'package:depense_track/data/model/categorie_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
+const uuid = Uuid();
 List<String> list = <String>['Une dépense', 'Un revenu'];
 
 class FormAddTransaction extends ConsumerStatefulWidget {
@@ -24,7 +26,7 @@ class _FormAddTransactionState extends ConsumerState<FormAddTransaction> {
   String dropdownValue = list.first;
   Categorie? _selectedCategory;
   void activePicker() async {
-    final date = await showDatePicker(
+    var date = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
       lastDate: DateTime(2070),
@@ -39,64 +41,6 @@ class _FormAddTransactionState extends ConsumerState<FormAddTransaction> {
     final validerForm = _formKey.currentState!.validate();
 
     if (validerForm) {
-      //verification de la selection de la categorie de depense
-      if (_selectedCategory == null && list[0] != 'Une dépense') {
-        showDialog(
-            context: context,
-            builder: (ctx) {
-              return AlertDialog(
-                title: const Text(
-                  "Erreur",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
-                ),
-                content: const Text(
-                  'Veulliez selectionnez une categorie de depense !',
-                  style: TextStyle(fontSize: 16),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('OK'),
-                  )
-                ],
-              );
-            });
-
-        return;
-      }
-      if (datechoisir == null) {
-        showDialog(
-            context: context,
-            builder: (ctx) {
-              return AlertDialog(
-                title: const Text(
-                  "Date non precisé",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
-                ),
-                content: const Text(
-                  'Ajouter la date',
-                  style: TextStyle(fontSize: 16),
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('OK'))
-                ],
-              );
-            });
-        return;
-      }
-
       _formKey.currentState!.save();
       if (validerForm) {
         final transactionAdd = ref.read(transactionRepositoriProvider);
@@ -104,16 +48,16 @@ class _FormAddTransactionState extends ConsumerState<FormAddTransaction> {
           TransactionModel(
             montant: montantDepense,
             typeTransaction:
-                dropdownValue == 'Un revenu' ? 'Revenu' : 'Dépense',
+                dropdownValue == 'Un revenu' ? 'revenu' : 'depense',
             categorieId: dropdownValue == 'Un revenu'
                 ? 0
                 : _selectedCategory!.categorieId,
             description: titreDepense,
-            date: datechoisir!,
+            date: datechoisir == null ? DateTime.now() : datechoisir!,
+            uuui: uuid.v4(),
           ),
         );
       }
-      setState(() {});
       Navigator.of(context).pop();
     }
   }

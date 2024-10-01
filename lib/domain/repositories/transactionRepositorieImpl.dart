@@ -1,7 +1,11 @@
 import 'package:depense_track/data/dataresources/local_db.dart';
+import 'package:depense_track/data/model/statistique.dart';
 import 'package:depense_track/data/model/transaction_model.dart';
 import 'package:depense_track/domain/entities/transation_entite.dart';
 import 'package:depense_track/domain/repositories/transaction_repositori.dart';
+import 'package:uuid/uuid.dart';
+
+const uuidd = Uuid();
 
 class Transactionrepositorieimpl implements TransactionRepositori {
   Transactionrepositorieimpl(this.localDb);
@@ -9,11 +13,13 @@ class Transactionrepositorieimpl implements TransactionRepositori {
   @override
   Future<void> addTransaction(TransactionEntite transaction) async {
     final transactionModel = TransactionModel(
-        montant: transaction.montant,
-        typeTransaction: transaction.typeTransaction,
-        categorieId: transaction.categorieId,
-        description: transaction.description,
-        date: transaction.date);
+      montant: transaction.montant,
+      typeTransaction: transaction.typeTransaction,
+      categorieId: transaction.categorieId,
+      description: transaction.description,
+      date: transaction.date,
+      uuui: uuidd.v4(),
+    );
     return localDb.insertionTransaction(transactionModel);
   }
 
@@ -37,5 +43,10 @@ class Transactionrepositorieimpl implements TransactionRepositori {
   @override
   Future<void> getTransaction() {
     return localDb.getTransaction();
+  }
+
+  @override
+  Stream<Statistique> watchStatique() {
+    return localDb.watchStatistique();
   }
 }
